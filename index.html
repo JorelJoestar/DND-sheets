@@ -57,7 +57,7 @@
     button {
       margin-top: 0.5em;
     }
-    #character-list li {
+    #character-list li, #story-list li {
       list-style: none;
       margin-bottom: 0.5em;
       cursor: pointer;
@@ -65,7 +65,7 @@
       padding: 0.5em;
       border-radius: 5px;
     }
-    #character-list li:hover {
+    #character-list li:hover, #story-list li:hover {
       background: #ccc;
     }
   </style>
@@ -80,8 +80,9 @@
       <ul id="character-list"></ul>
       <button onclick="newSheet()">+ New Character</button>
       <hr />
-      <h3>Story</h3>
-      <button onclick="toggleStory()">📝 View/Add Story</button>
+      <h3>Stories</h3>
+      <ul id="story-list"></ul>
+      <button onclick="newStory()">+ New Story</button>
     </div>
     <div class="main">
       <div class="sheet-input" id="character-section">
@@ -116,14 +117,19 @@
         <button onclick="deleteSheet()">🗑️ Delete</button>
       </div>
       <div class="sheet-input" id="story-section" style="display: none;">
+        <label>Story Title:</label>
+        <input type="text" id="storyTitle">
+
         <label>Story Log:</label>
         <textarea id="storyText" rows="10"></textarea>
         <button onclick="saveStory()">💾 Save Story</button>
+        <button onclick="deleteStory()">🗑️ Delete Story</button>
       </div>
     </div>
   </div>
   <script>
     let currentCharacter = null;
+    let currentStory = null;
 
     function loadCharacters() {
       const list = document.getElementById('character-list');
@@ -137,10 +143,23 @@
       }
     }
 
+    function loadStories() {
+      const list = document.getElementById('story-list');
+      list.innerHTML = '';
+      const stories = JSON.parse(localStorage.getItem('dndStories') || '{}');
+      for (const title in stories) {
+        const li = document.createElement('li');
+        li.textContent = title;
+        li.onclick = () => loadStory(title);
+        list.appendChild(li);
+      }
+    }
+
     function loadSheet(name) {
       const chars = JSON.parse(localStorage.getItem('dndChars') || '{}');
       const char = chars[name];
       currentCharacter = name;
+      currentStory = null;
       document.getElementById('charName').value = char.name || '';
       document.getElementById('charClassLevel').value = char.classLevel || '';
       document.getElementById('charBackground').value = char.background || '';
@@ -199,23 +218,42 @@
       showCharacterSection();
     }
 
-    function toggleStory() {
-      const story = document.getElementById('story-section');
-      const char = document.getElementById('character-section');
-      if (story.style.display === 'none') {
-        char.style.display = 'none';
-        story.style.display = 'block';
-        document.getElementById('storyText').value = localStorage.getItem('dndStory') || '';
-      } else {
-        story.style.display = 'none';
-        char.style.display = 'block';
-      }
+    function newStory() {
+      currentStory = null;
+      document.getElementById('storyTitle').value = "";
+      document.getElementById('storyText').value = "";
+      showStorySection();
+    }
+
+    function loadStory(title) {
+      const stories = JSON.parse(localStorage.getItem('dndStories') || '{}');
+      document.getElementById('storyTitle').value = title;
+      document.getElementById('storyText').value = stories[title] || '';
+      currentStory = title;
+      showStorySection();
     }
 
     function saveStory() {
+      const title = document.getElementById('storyTitle').value;
       const text = document.getElementById('storyText').value;
-      localStorage.setItem('dndStory', text);
+      if (!title) return alert("Please enter a story title.");
+      const stories = JSON.parse(localStorage.getItem('dndStories') || '{}');
+      stories[title] = text;
+      localStorage.setItem('dndStories', JSON.stringify(stories));
       alert("Story saved!");
+      currentStory = title;
+      loadStories();
+    }
+
+    function deleteStory() {
+      if (!currentStory) return alert("No story selected.");
+      const stories = JSON.parse(localStorage.getItem('dndStories') || '{}');
+      delete stories[currentStory];
+      localStorage.setItem('dndStories', JSON.stringify(stories));
+      alert("Deleted story!");
+      currentStory = null;
+      newStory();
+      loadStories();
     }
 
     function showCharacterSection() {
@@ -223,7 +261,15 @@
       document.getElementById('story-section').style.display = 'none';
     }
 
-    window.onload = loadCharacters;
+    function showStorySection() {
+      document.getElementById('story-section').style.display = 'block';
+      document.getElementById('character-section').style.display = 'none';
+    }
+
+    window.onload = function () {
+      loadCharacters();
+      loadStories();
+    }
   </script>
 </body>
 </html>

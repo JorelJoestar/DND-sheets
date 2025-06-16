@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D&D Character Tracker (Local)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #20232a;
+      color: white;
+      padding: 1em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 250px;
+      background: #f4f4f4;
+      padding: 1em;
+      overflow-y: auto;
+    }
+    .main {
+      flex-grow: 1;
+      padding: 1em;
+      overflow-y: auto;
+    }
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+      }
+    }
+    .sheet-input {
+      margin-bottom: 1em;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.2em;
+    }
+    button {
+      margin-top: 0.5em;
+    }
+    #character-list li {
+      list-style: none;
+      margin-bottom: 0.5em;
+      cursor: pointer;
+      background: #ddd;
+      padding: 0.5em;
+      border-radius: 5px;
+    }
+    #character-list li:hover {
+      background: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>D&D Character Tracker</h1>
+  </header>
+  <div class="container">
+    <div class="sidebar">
+      <h3>Characters</h3>
+      <ul id="character-list"></ul>
+      <button onclick="newSheet()">+ New Character</button>
+    </div>
+    <div class="main">
+      <div class="sheet-input">
+        <label>Name:</label>
+        <input type="text" id="charName">
+
+        <label>Class & Level:</label>
+        <input type="text" id="charClassLevel">
+
+        <label>Background:</label>
+        <input type="text" id="charBackground">
+
+        <label>Player Name:</label>
+        <input type="text" id="charPlayer">
+
+        <label>Race:</label>
+        <input type="text" id="charRace">
+
+        <label>Alignment:</label>
+        <input type="text" id="charAlignment">
+
+        <label>Experience Points:</label>
+        <input type="number" id="charXP">
+
+        <label>Ability Scores (JSON: {"STR":10,"DEX":14,...}):</label>
+        <input type="text" id="charAbilities">
+
+        <label>Notes:</label>
+        <textarea id="charNotes"></textarea>
+
+        <button onclick="saveSheet()">💾 Save</button>
+        <button onclick="deleteSheet()">🗑️ Delete</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    let currentCharacter = null;
+
+    function loadCharacters() {
+      const list = document.getElementById('character-list');
+      list.innerHTML = '';
+      const chars = JSON.parse(localStorage.getItem('dndChars') || '{}');
+      for (const name in chars) {
+        const li = document.createElement('li');
+        li.textContent = name;
+        li.onclick = () => loadSheet(name);
+        list.appendChild(li);
+      }
+    }
+
+    function loadSheet(name) {
+      const chars = JSON.parse(localStorage.getItem('dndChars') || '{}');
+      const char = chars[name];
+      currentCharacter = name;
+      document.getElementById('charName').value = char.name || '';
+      document.getElementById('charClassLevel').value = char.classLevel || '';
+      document.getElementById('charBackground').value = char.background || '';
+      document.getElementById('charPlayer').value = char.player || '';
+      document.getElementById('charRace').value = char.race || '';
+      document.getElementById('charAlignment').value = char.alignment || '';
+      document.getElementById('charXP').value = char.xp || 0;
+      document.getElementById('charAbilities').value = JSON.stringify(char.abilities || {});
+      document.getElementById('charNotes').value = char.notes || '';
+    }
+
+    function saveSheet() {
+      const name = document.getElementById('charName').value;
+      if (!name) return alert("Please enter a name.");
+      const chars = JSON.parse(localStorage.getItem('dndChars') || '{}');
+      chars[name] = {
+        name,
+        classLevel: document.getElementById('charClassLevel').value,
+        background: document.getElementById('charBackground').value,
+        player: document.getElementById('charPlayer').value,
+        race: document.getElementById('charRace').value,
+        alignment: document.getElementById('charAlignment').value,
+        xp: parseInt(document.getElementById('charXP').value, 10),
+        abilities: JSON.parse(document.getElementById('charAbilities').value || '{}'),
+        notes: document.getElementById('charNotes').value
+      };
+      localStorage.setItem('dndChars', JSON.stringify(chars));
+      alert("Saved!");
+      loadCharacters();
+      currentCharacter = name;
+    }
+
+    function deleteSheet() {
+      if (!currentCharacter) return alert("No sheet selected.");
+      const chars = JSON.parse(localStorage.getItem('dndChars') || '{}');
+      delete chars[currentCharacter];
+      localStorage.setItem('dndChars', JSON.stringify(chars));
+      alert("Deleted!");
+      currentCharacter = null;
+      newSheet();
+      loadCharacters();
+    }
+
+    function newSheet() {
+      currentCharacter = null;
+      document.getElementById('charName').value = "";
+      document.getElementById('charClassLevel').value = "";
+      document.getElementById('charBackground').value = "";
+      document.getElementById('charPlayer').value = "";
+      document.getElementById('charRace').value = "";
+      document.getElementById('charAlignment').value = "";
+      document.getElementById('charXP').value = 0;
+      document.getElementById('charAbilities').value = "{}";
+      document.getElementById('charNotes').value = "";
+    }
+
+    window.onload = loadCharacters;
+  </script>
+</body>
+</html>

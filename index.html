@@ -110,6 +110,9 @@
         <label>Ability Scores (JSON: {"STR":10,"DEX":14,...}):</label>
         <input type="text" id="charAbilities">
 
+        <label>Lore:</label>
+        <textarea type="text" id="charLore"></textarea>
+        
         <label>Notes:</label>
         <textarea id="charNotes"></textarea>
 
@@ -168,6 +171,7 @@
       document.getElementById('charAlignment').value = char.alignment || '';
       document.getElementById('charXP').value = char.xp || 0;
       document.getElementById('charAbilities').value = JSON.stringify(char.abilities || {});
+      document.getElementById('charLore').value = char.lore || '';
       document.getElementById('charNotes').value = char.notes || '';
       showCharacterSection();
     }
@@ -185,6 +189,7 @@
         alignment: document.getElementById('charAlignment').value,
         xp: parseInt(document.getElementById('charXP').value, 10),
         abilities: JSON.parse(document.getElementById('charAbilities').value || '{}'),
+        lore: document.getElementById('charLore').value,
         notes: document.getElementById('charNotes').value
       };
       localStorage.setItem('dndChars', JSON.stringify(chars));
@@ -214,6 +219,7 @@
       document.getElementById('charAlignment').value = "";
       document.getElementById('charXP').value = 0;
       document.getElementById('charAbilities').value = "{}";
+      document.getElementById('charLore').value = "";
       document.getElementById('charNotes').value = "";
       showCharacterSection();
     }

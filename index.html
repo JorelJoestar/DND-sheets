@@ -170,7 +170,7 @@
       document.getElementById('charRace').value = char.race || '';
       document.getElementById('charAlignment').value = char.alignment || '';
       document.getElementById('charXP').value = char.xp || 0;
-      document.getElementById('charAbilities').value = JSON.stringify(char.abilities || {});
+      document.getElementById('charAbilities').value = char.abilities || '';
       document.getElementById('charLore').value = char.lore || '';
       document.getElementById('charNotes').value = char.notes || '';
       showCharacterSection();
@@ -188,7 +188,7 @@
         race: document.getElementById('charRace').value,
         alignment: document.getElementById('charAlignment').value,
         xp: parseInt(document.getElementById('charXP').value, 10),
-        abilities: JSON.parse(document.getElementById('charAbilities').value || '{}'),
+        abilities: document.getElementById('charAbilities').value,
         lore: document.getElementById('charLore').value,
         notes: document.getElementById('charNotes').value
       };
@@ -218,7 +218,7 @@
       document.getElementById('charRace').value = "";
       document.getElementById('charAlignment').value = "";
       document.getElementById('charXP').value = 0;
-      document.getElementById('charAbilities').value = "{}";
+      document.getElementById('charAbilities').value = "";
       document.getElementById('charLore').value = "";
       document.getElementById('charNotes').value = "";
       showCharacterSection();

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="logo.png" href="favicon-32x32.png" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>D&D Customized (Local)</title>
@@ -72,16 +71,19 @@
 </head>
 <body>
   <header>
-    <h1>D&D Character Sheets</h1>
+    <h1>D&D Character Tracker</h1>
   </header>
   <div class="container">
     <div class="sidebar">
       <h3>Characters</h3>
       <ul id="character-list"></ul>
       <button onclick="newSheet()">+ New Character</button>
+      <hr />
+      <h3>Story</h3>
+      <button onclick="toggleStory()">📝 View/Add Story</button>
     </div>
     <div class="main">
-      <div class="sheet-input">
+      <div class="sheet-input" id="character-section">
         <label>Name:</label>
         <input type="text" id="charName">
 
@@ -111,6 +113,11 @@
 
         <button onclick="saveSheet()">💾 Save</button>
         <button onclick="deleteSheet()">🗑️ Delete</button>
+      </div>
+      <div class="sheet-input" id="story-section" style="display: none;">
+        <label>Story Log:</label>
+        <textarea id="storyText" rows="10"></textarea>
+        <button onclick="saveStory()">💾 Save Story</button>
       </div>
     </div>
   </div>
@@ -142,6 +149,7 @@
       document.getElementById('charXP').value = char.xp || 0;
       document.getElementById('charAbilities').value = JSON.stringify(char.abilities || {});
       document.getElementById('charNotes').value = char.notes || '';
+      showCharacterSection();
     }
 
     function saveSheet() {
@@ -187,6 +195,31 @@
       document.getElementById('charXP').value = 0;
       document.getElementById('charAbilities').value = "{}";
       document.getElementById('charNotes').value = "";
+      showCharacterSection();
+    }
+
+    function toggleStory() {
+      const story = document.getElementById('story-section');
+      const char = document.getElementById('character-section');
+      if (story.style.display === 'none') {
+        char.style.display = 'none';
+        story.style.display = 'block';
+        document.getElementById('storyText').value = localStorage.getItem('dndStory') || '';
+      } else {
+        story.style.display = 'none';
+        char.style.display = 'block';
+      }
+    }
+
+    function saveStory() {
+      const text = document.getElementById('storyText').value;
+      localStorage.setItem('dndStory', text);
+      alert("Story saved!");
+    }
+
+    function showCharacterSection() {
+      document.getElementById('character-section').style.display = 'block';
+      document.getElementById('story-section').style.display = 'none';
     }
 
     window.onload = loadCharacters;
